@@ -169,6 +169,15 @@ cd ..
 python python/analyze.py data/sim_external.csv
 ```
 
+## Recent results (updated 2026-03-15)
+
+- Demo run (`data/sim_demo.csv`): 4999 returns; Hill tail estimate: NaN (sample too small/noisy); rough Hurst ≈ 0.503.
+- External-driven run (`data/sim_external.csv`): 2122 returns; Hill tail estimate: NaN; rough Hurst ≈ 0.269.
+
+The analysis was produced with `python/analyze.py`, which now guards against non-positive prices and uses a robust returns computation. Plots were regenerated to `python/price_returns.png` and `python/rolling_vol.png`.
+
+These short-run estimates are informative but noisy; run larger Monte Carlo experiments (10k+ steps/replicates) for stable tail-index estimates.
+
 ## Next steps
 
 - Run large-scale Monte Carlo experiments (10k+ runs), aggregate tail-index and crisis-frequency statistics.
