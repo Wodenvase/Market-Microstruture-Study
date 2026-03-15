@@ -128,11 +128,11 @@ Therefore multiplicative amplification by low-liquidity episodes can produce hea
 
 - Demo outputs included: `data/sim_demo.csv`.
 
-![Returns time series (log-returns)](python/price_returns.png)
+![Returns time series (log-returns)](python/price_returns_2026-03-15.png)
 
 **Figure:** Returns time series (log-returns). Interpretation: the series shows intermittent spikes; for the short demo the Hill tail estimate is noisy (NaN). Use larger Monte Carlo samples for robust tail estimates.
 
-![Rolling volatility (window=100)](python/rolling_vol.png)
+![Rolling volatility (window=100)](python/rolling_vol_2026-03-15.png)
 
 **Figure:** Rolling volatility (window=100). Interpretation: visible volatility clustering—periods of elevated volatility are consistent with endogenous liquidity withdrawal and amplification mechanisms in the model.
 
