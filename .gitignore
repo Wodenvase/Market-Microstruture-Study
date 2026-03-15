@@ -1,0 +1,6 @@
+target/
+**/*.pyc
+__pycache__/
+data/*.csv
+rust_simulator/target/
+venv/

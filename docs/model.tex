@@ -1,0 +1,37 @@
+% Model specification: Endogenous liquidity, volatility, and leverage
+\documentclass{article}
+\usepackage{amsmath}
+\begin{document}
+\section*{Model specification}
+
+State vector:
+\[
+X_t = \begin{pmatrix} P_t \\ L_t \\ \sigma_t \\ q_i(t) \\ \ell_i(t) \end{pmatrix}
+\]
+
+Price formation (order imbalance):
+\[
+dP_t = \frac{1}{L_t} \, dI_t
+\]
+
+Liquidity dynamics (deterministic drift approximation):
+\[
+\frac{dL_t}{dt} = \alpha - \beta \sigma_t L_t - \gamma \, \text{InventoryRisk}_t
+\]
+
+Endogenous volatility (proxy):
+\[
+\sigma_t^2 = \frac{\mathrm{Var}(dI_t)}{L_t^2}
+\]
+
+Leverage and margin constraints (agent i):
+\[
+\ell_i(t) = \frac{\text{Position}_i(t) \cdot P_t}{\text{Equity}_i(t)}
+\]
+If $\ell_i(t) > \ell_{\max}$ then forced liquidation generates additional order flow $dI_t^{forced}$.
+
+Stability analysis proceeds from fixed points of $L_t$ solving $0 = \alpha - \beta \sigma^* L^* - \gamma \, \mathrm{InventoryRisk}^*$, linearizing dynamics, and studying bifurcations in $(\alpha,\beta,\gamma)$ space.
+
+Fat tails may arise because returns scale as $dP_t \sim dI_t / L_t$, so multiplicative stochasticity in $L_t$ can turn thin-tailed $dI_t$ into heavy-tailed returns.
+
+\end{document}
