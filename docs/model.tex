@@ -11,27 +11,46 @@ X_t = \begin{pmatrix} P_t \\ L_t \\ \sigma_t \\ q_i(t) \\ \ell_i(t) \end{pmatrix
 
 Price formation (order imbalance):
 \[
-dP_t = \frac{1}{L_t} \, dI_t
+dP_t = \frac{1}{L_t} dI_t
 \]
 
-Liquidity dynamics (deterministic drift approximation):
+Liquidity dynamics (deterministic skeleton):
 \[
-\frac{dL_t}{dt} = \alpha - \beta \sigma_t L_t - \gamma \, \text{InventoryRisk}_t
+\frac{dL_t}{dt} = \alpha - \beta \sigma_t L_t - \gamma \, \mathrm{InventoryRisk}_t
 \]
 
-Endogenous volatility (proxy):
+Endogenous volatility (instantaneous proxy):
 \[
 \sigma_t^2 = \frac{\mathrm{Var}(dI_t)}{L_t^2}
 \]
 
-Leverage and margin constraints (agent i):
+Leverage and margin constraints (agent $i$):
 \[
 \ell_i(t) = \frac{\text{Position}_i(t) \cdot P_t}{\text{Equity}_i(t)}
 \]
-If $\ell_i(t) > \ell_{\max}$ then forced liquidation generates additional order flow $dI_t^{forced}$.
+If $\ell_i(t)>\ell_{\max}$, forced liquidation generates additional order flow $dI_t^{\mathrm{forced}}$ which can produce cascades.
 
-Stability analysis proceeds from fixed points of $L_t$ solving $0 = \alpha - \beta \sigma^* L^* - \gamma \, \mathrm{InventoryRisk}^*$, linearizing dynamics, and studying bifurcations in $(\alpha,\beta,\gamma)$ space.
+Equilibrium and stability (informal):
+At a steady-state $(L^*,\sigma^*)$ solve
+\[
+0 = \alpha - \beta \sigma^* L^* - \gamma \mathrm{IR}^*
+\]
+Under closures where $\sigma^*=S/L^*$ with $S=\sqrt{\mathrm{Var}(dI_t)}$ the product $\sigma^* L^*=S$ and the equilibrium reduces to
+\[
+\alpha - \beta S - \gamma \mathrm{IR}^* = 0
+\]
+Linearizing the $L$-dynamics yields
+\[
+\frac{d}{dt} \delta L_t \approx -\beta \big( \sigma^* \delta L_t + L^* \delta \sigma_t \big) - \gamma \delta \mathrm{IR}_t
+\]
+If $\sigma_t=S/L_t$ then $\delta \sigma_t = -\frac{S}{L^{*2}} \delta L_t$ and interaction with inventory feedback and stochastic order-flow variance determines (in)stability.
 
-Fat tails may arise because returns scale as $dP_t \sim dI_t / L_t$, so multiplicative stochasticity in $L_t$ can turn thin-tailed $dI_t$ into heavy-tailed returns.
+Fat-tail mechanism (sketch): returns scale as $r \approx dI / L$. If small-$L$ events have tail exponent $\kappa$ so that $\Pr(L<\ell)\sim C \ell^{\kappa}$, then
+\[
+\Pr(|r|>x) \approx \int_0^{\infty} \Pr(|dI|>x \ell) f_L(\ell) \, d\ell \sim x^{-\kappa}
+\]
+so multiplicative liquidity fluctuations can produce power-law return tails even when $dI$ is thin-tailed.
+
+Extensions and notes: this file gives a compact summary; see the README and planned appendix for fuller derivations and rigorous statements.
 
 \end{document}
