@@ -119,3 +119,50 @@ Below are concise analytical statements and derivations underlying the simulatio
 
 For full derivations and rigorous statements (spectral/limit theorems, precise conditions for power-law tails), see the analytical notes in `docs/model.tex` and planned extensions in the `docs/` folder.
 
+**External price-generation script (piecewise rule)**
+
+We also support using an external price-generation rule of the form:
+
+$$
+P_t = \begin{cases}
+HR\cdot P^{gas}_t + \tau_t\cdot EI, & x_t > Q_{baseload}, \\
+0, & x_t \le Q_{baseload}.
+\end{cases}
+$$
+
+Where:
+
+- $HR$ is a scaling (heat-rate or conversion) parameter.
+- $P^{gas}_t$ is an exogenous gas-price time series used as a driver.
+- $\tau_t$ is a time-dependent weighting (e.g., dispatch or transmission factor).
+- $EI$ is an emissions/intensity constant or index applied when the threshold condition is met.
+- $x_t$ is an observed driver (e.g., demand), and $Q_{baseload}$ is a baseload threshold.
+
+Usage notes:
+
+- This piecewise rule can be plugged into the simulator as an external `P_t` driver for scenario analysis (replace the endogenous `price` update or add as an exogenous shock term). Implementing this requires reading the auxiliary time series `P^{gas}_t` and `\tau_t` and evaluating the threshold `x_t>Q_{baseload}` at each simulation step.
+- A simple Python snippet to evaluate the rule for a vectorized time series `t`:
+
+```python
+import numpy as np
+
+def external_price(P_gas, tau, x, Q_baseload, HR, EI):
+	P = np.where(x > Q_baseload, HR * P_gas + tau * EI, 0.0)
+	return P
+```
+
+- To use inside the Rust simulator you can precompute the external `P_t` sequence and feed it as an input file (or extend the simulator to read the series and apply it each step).
+
+This addition supports experiments coupling external fuel/commodity drivers to market microstructure dynamics, e.g., studying how exogenous spikes in `P^{gas}_t` interact with endogenous liquidity to produce extreme price moves.
+
+Example: running an external-driver experiment
+
+1. Generate an external series and run the simulator (replace endogenous price with `P_ext`):
+
+```bash
+python python/run_external_experiment.py
+```
+
+2. The script writes `data/external.csv`, runs the simulator to produce `data/sim_external.csv`, and runs the analyzer to produce plots in `python/`.
+
+

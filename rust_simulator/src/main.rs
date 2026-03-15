@@ -53,6 +53,19 @@ fn main() {
         .map(|s| s.as_str())
         .unwrap_or("data/sim.csv");
 
+    let external_path = args
+        .iter()
+        .position(|s| s == "--external")
+        .and_then(|i| args.get(i + 1))
+        .map(|s| s.as_str());
+
+    let external_mode = args
+        .iter()
+        .position(|s| s == "--external-mode")
+        .and_then(|i| args.get(i + 1))
+        .map(|s| s.as_str())
+        .unwrap_or("replace");
+
     let dt = 1.0 / 252.0; // 1 trading day normalized
     let mut rng: StdRng = if seed == 0 { StdRng::from_entropy() } else { StdRng::seed_from_u64(seed) };
     let noise_dist = Normal::new(0.0, 1.0).unwrap();
@@ -85,6 +98,26 @@ fn main() {
     // simple moving window for order variance approx
     let mut recent_flows: Vec<f64> = Vec::with_capacity(1000);
 
+    // load external series if provided (expect CSV with header and column `P_ext`)
+    let mut external: Vec<f64> = Vec::new();
+    if let Some(path) = external_path {
+        if let Ok(s) = std::fs::read_to_string(path) {
+            for (i, line) in s.lines().enumerate() {
+                if i == 0 { continue; }
+                let fields: Vec<&str> = line.split(',').collect();
+                // expect last column is P_ext or column named P_ext; try last
+                if let Some(last) = fields.last() {
+                    if let Ok(v) = last.parse::<f64>() {
+                        external.push(v);
+                    }
+                }
+            }
+            eprintln!("Loaded external series len={}", external.len());
+        } else {
+            eprintln!("Failed to read external file: {}", path);
+        }
+    }
+
     for t in 0..steps {
         let time = t as f64 * dt;
 
@@ -115,6 +148,21 @@ fn main() {
         // price impact
         let dP = if state.depth.abs() < 1e-6 { dI.signum() * 1e-3 } else { dI / state.depth };
         state.price += dP;
+
+        // external driver application (if provided)
+        if !external.is_empty() {
+            let idx = (t as usize) % external.len();
+            let p_ext = external[idx];
+            match external_mode {
+                "replace" => {
+                    state.price = p_ext;
+                }
+                "shock" => {
+                    state.price += p_ext;
+                }
+                _ => {}
+            }
+        }
 
         // update fund inventory and equity (market orders executed at mid-price)
         fund_inventory += fund_flow + forced_flow;
