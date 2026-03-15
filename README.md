@@ -106,12 +106,6 @@ $$
 
 Linear stability (informal)
 
-Linearizing around $L^*$ gives
-
-$$
-\frac{d}{dt} \delta L_t \approx -\beta\big(\sigma^*\,\delta L_t + L^*\,\delta\sigma_t\big) - \gamma\,\delta\mathrm{IR}_t.
-$$
-
 For the coupling $\sigma_t = S/L_t$ we have $\delta\sigma_t = -\frac{S}{L^{*2}}\delta L_t$. The effective damping depends on inventory feedback and higher-order terms; delayed or nonlinear inventory feedback commonly produces negative damping and drives liquidity collapse (endogenous crises).
 
 Fat tails (mechanism sketch)
